@@ -97,11 +97,18 @@ static void tildify(char const* path) {
 				if(home[i] == '\0' && home[i - 1] == '/') --i;
 				if(opts.intermediate_width > 0) {
 					printf("~%s", opts.short_user && opts.uid == pwent->pw_uid ? "" : pwent->pw_name);
-					size_t j = i;
-					while(path[j]) {
-						printf("/%.*s", opts.intermediate_width, path + j + 1);
+					for(;;) {
+						size_t j = i;
+						do {
+							++i;
+						} while(path[i] && path[i] != '/');
+						if(path[i]) {
+							printf("/%.*s", (int)(i - j - 1) < opts.intermediate_width ? (int)(i - j - 1) : opts.intermediate_width, path + j + 1);
+						} else {
+							printf("/%s\n", path + j + 1);
+							break;
+						}
 					}
-					printf("%s\n", path);
 				} else printf("%s\n", path + i);
 				return;
 			}
