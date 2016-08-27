@@ -103,7 +103,8 @@ static void tildify(char const* path) {
 							++i;
 						} while(path[i] && path[i] != '/');
 						if(path[i]) {
-							printf("/%.*s", (int)(i - j - 1) < opts.intermediate_width ? (int)(i - j - 1) : opts.intermediate_width, path + j + 1);
+							int width = (int)(i - j - 1) < opts.intermediate_width ? (int)(i - j - 1) : opts.intermediate_width;
+							printf("/%.*s", width, path + j + 1);
 						} else {
 							printf("/%s\n", path + j + 1);
 							break;
@@ -133,6 +134,21 @@ int main(int argc, char** argv) {
 				#if CLEANUP
 				endpwent();
 				#endif
+				int err = errno;
+				switch(err) {
+					case EACCES:
+						fprintf(stderr, "Cannot open %s (permission denied)\n", argv[i]);
+						break;
+
+					case ENOTDIR:
+					case ENOENT:
+						fprintf(stderr, "Cannot open %s (path does not exist)\n", argv[i]);
+						break;
+
+					default:
+						fprintf(stderr, "Cannot open %s (error %d)\n", argv[i], err);
+						break;
+				}
 				return RC_REALPATH_FAILURE;
 			}
 			tildify(buff);
