@@ -75,14 +75,16 @@ static bool parse_opts(int* argc, char** argv) {
 }
 
 static void usage(FILE* f) {
-	fprintf(f, "Usage: %s [options] [--] [path ...]\n", opts.name);
-	fprintf(f, "Prints a normalized version of each path. If none is given, then \".\" is used.\n");
-	fprintf(f, "\n");
-	fprintf(f, "Options:\n");
-	fprintf(f, "  --                         Stop parsing Arguments\n");
-	fprintf(f, "  -h --help                  Show this help, then exit\n");
-	fprintf(f, "     --intermediate-width N  Shorten all intermediate directories to N characters\n");
-	fprintf(f, "     --short                 Shorten the home directory of the current user to just '~'\n");
+	fprintf(f,
+		"Usage: %s [options] [--] [path ...]\n"
+		"Prints a normalized version of each path. If none is given, then \".\" is used.\n"
+		"\n"
+		"Options:\n"
+		"  --                         Stop parsing Arguments\n"
+		"  -h --help                  Show this help, then exit\n"
+		"     --intermediate-width N  Shorten all intermediate directories to N characters\n"
+		"     --short                 Shorten the home directory of the current user to just '~'\n"
+	, opts.name);
 }
 
 static void tildify(char const* path) {
