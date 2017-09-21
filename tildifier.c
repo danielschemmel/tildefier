@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <stddef.h>
