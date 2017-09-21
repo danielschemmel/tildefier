@@ -5,11 +5,11 @@ OPTS :=
 LIBS := 
 STD := c11
 
-RELEASEOPTS := -O3
+RELEASEOPTS := -O3 -flto
 PROFILEOPTS := -pg -O3
 DEBUGOPTS   := -g
 
-COMPILER := cc
+COMPILER := $(shell which musl-gcc >/dev/null 2>/dev/null && echo musl-gcc -static || echo cc)
 WERROR := -Werror
 DEFAULTOPTS := -Wall -Wextra -pedantic $(WERROR) -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700
 DEFAULTLIBS := 
