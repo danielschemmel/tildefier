@@ -5,7 +5,7 @@ OPTS :=
 LIBS := 
 STD := c11
 
-RELEASEOPTS := -O3
+RELEASEOPTS := -O3 -flto
 PROFILEOPTS := -pg -O3
 DEBUGOPTS   := -g
 
