@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <stddef.h>
@@ -26,9 +27,10 @@ static struct {
 	char const* name;
 	uid_t uid;
 	int intermediate_width;
-	bool short_user, help;
+	bool newline, short_user, help;
 } opts = {
 	.name = "tildifer",
+	.newline = true,
 	.short_user = false,
 	.intermediate_width = 0,
 	.help = false
@@ -59,12 +61,18 @@ static bool parse_opts(int* argc, char** argv) {
 					if(errno || !end || *end) return false;
 					if(width <= 0 || width > INT_MAX) return false;
 					opts.intermediate_width = (int)width;
+				} else if(strcmp("no-newline", arg + 2) == 0) {
+					opts.newline = false;
 				} else if(strcmp("short", arg + 2) == 0) {
 					opts.short_user = true;
 				} else return false;
 			} else if(arg[1] == 'h') {
 				if(arg[2] == '\0') {
 					opts.help = true;
+				} else return false;
+			} else if(arg[1] == 'n') {
+				if(arg[2] == '\0') {
+					opts.newline = false;
 				} else return false;
 			} else return false;
 		} else argv[to++] = arg;
@@ -83,6 +91,7 @@ static void usage(FILE* f) {
 		"  --                         Stop parsing Arguments\n"
 		"  -h --help                  Show this help, then exit\n"
 		"     --intermediate-width N  Shorten all intermediate directories to N characters\n"
+		"  -n --no-newline            Do not output a newline\n"
 		"     --short                 Shorten the home directory of the current user to just '~'\n"
 	, opts.name);
 }
@@ -107,11 +116,11 @@ static void tildify(char const* path) {
 						if(path[i]) {
 							printf("/%.*s", (int)(i - j - 1) < opts.intermediate_width ? (int)(i - j - 1) : opts.intermediate_width, path + j + 1);
 						} else {
-							printf("/%s\n", path + j + 1);
+							printf("/%s%s", path + j + 1, opts.newline ? "\n" : "");
 							break;
 						}
 					}
-				} else printf("%s\n", path + i);
+				} else printf("%s%s", path + i, opts.newline ? "\n" : "");
 				return;
 			}
 		}
