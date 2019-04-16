@@ -1,4 +1,4 @@
-NAME := tildifier
+NAME := tildefier
 PARAMS := 
 
 OPTIMIZE := -O3 -flto
