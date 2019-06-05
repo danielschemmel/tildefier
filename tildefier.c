@@ -152,32 +152,30 @@ int main(int argc, char** argv) {
 	}
 
 	for(int i = 0; i < argc; ++i) {
-		if(argv[i][0] != '/') {
-			char* buff = realpath(argv[i], NULL);
-			if(!buff) {
-				#if CLEANUP
-				endpwent();
-				#endif
-				int err = errno;
-				switch(err) {
-					case EACCES:
-						fprintf(stderr, "Cannot open %s (permission denied)\n", argv[i]);
-						break;
+		char* buff = realpath(argv[i], NULL);
+		if(!buff) {
+			#if CLEANUP
+			endpwent();
+			#endif
+			int err = errno;
+			switch(err) {
+				case EACCES:
+					fprintf(stderr, "Cannot open %s (permission denied)\n", argv[i]);
+					break;
 
-					case ENOTDIR:
-					case ENOENT:
-						fprintf(stderr, "Cannot open %s (path does not exist)\n", argv[i]);
-						break;
+				case ENOTDIR:
+				case ENOENT:
+					fprintf(stderr, "Cannot open %s (path does not exist)\n", argv[i]);
+					break;
 
-					default:
-						fprintf(stderr, "Cannot open %s (error %d)\n", argv[i], err);
-						break;
-				}
-				return RC_REALPATH_FAILURE;
+				default:
+					fprintf(stderr, "Cannot open %s (error %d)\n", argv[i], err);
+					break;
 			}
-			tildefy(buff);
-			free(buff);
-		} else tildefy(argv[i]);
+			return RC_REALPATH_FAILURE;
+		}
+		tildefy(buff);
+		free(buff);
 	}
 
 	#if CLEANUP
