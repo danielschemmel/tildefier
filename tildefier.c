@@ -29,7 +29,7 @@ static struct {
 	int intermediate_width;
 	bool newline, short_user, help;
 } opts = {
-	.name = "tildefer",
+	.name = "tildefier",
 	.newline = true,
 	.short_user = false,
 	.intermediate_width = 0,
