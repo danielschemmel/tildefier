@@ -94,7 +94,7 @@ static bool parse_opts(int* argc, char** argv) {
 static void usage(FILE* f) {
 	fprintf(f,
 		"Usage: %s [options] [--] [path ...]\n"
-		"Prints a normalized version of each path. If no paths are given on the command line, the current working directory is used.\n"
+		"Prints a normalized, absolute version of each path where the prefix is given as an user's home directory if possible. If no paths are given on the command line, the current working directory is used.\n"
 		"\n"
 		"Options:\n"
 		"  --                         Stop parsing Arguments\n"
