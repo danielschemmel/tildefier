@@ -15,6 +15,8 @@
 #define CLEANUP 0
 #endif
 
+#define TILDEFIER_VERSION_STRING "tildefier version " VERSION
+
 enum rc {
 	RC_SUCCESS,
 	RC_ARGUMENT_PARSING,
@@ -27,13 +29,14 @@ static struct {
 	char const* name;
 	uid_t uid;
 	int intermediate_width;
-	bool newline, short_user, help;
+	bool newline, short_user, help, version;
 } opts = {
 	.name = "tildefier",
 	.newline = true,
 	.short_user = false,
 	.intermediate_width = 0,
-	.help = false
+	.help = false,
+	.version = false,
 };
 
 static void set_default_opts(void) {
@@ -53,6 +56,8 @@ static bool parse_opts(int* argc, char** argv) {
 					stop = true;
 				} else if(strcmp("help", arg + 2) == 0) {
 					opts.help = true;
+				} else if(strcmp("version", arg + 2) == 0) {
+					opts.version = true;
 				} else if(strcmp("intermediate-width", arg + 2) == 0) {
 					if(++from >= *argc) return false;
 					char* end = NULL;
@@ -74,6 +79,10 @@ static bool parse_opts(int* argc, char** argv) {
 				if(arg[2] == '\0') {
 					opts.newline = false;
 				} else return false;
+			} else if(arg[1] == 'v') {
+				if(arg[2] == '\0') {
+					opts.version = true;
+				} else return false;
 			} else return false;
 		} else argv[to++] = arg;
 	}
@@ -85,7 +94,7 @@ static bool parse_opts(int* argc, char** argv) {
 static void usage(FILE* f) {
 	fprintf(f,
 		"Usage: %s [options] [--] [path ...]\n"
-		"Prints a normalized version of each path. If none is given, then \".\" is used.\n"
+		"Prints a normalized version of each path. If no paths are given on the command line, the current working directory is used.\n"
 		"\n"
 		"Options:\n"
 		"  --                         Stop parsing Arguments\n"
@@ -93,6 +102,7 @@ static void usage(FILE* f) {
 		"     --intermediate-width N  Shorten all intermediate directories to N characters\n"
 		"  -n --no-newline            Do not output a newline\n"
 		"     --short                 Shorten the home directory of the current user to just '~'\n"
+		"  -v --version               Print \"" TILDEFIER_VERSION_STRING "\"\n"
 	, opts.name);
 }
 
@@ -135,6 +145,9 @@ int main(int argc, char** argv) {
 		return RC_ARGUMENT_PARSING;
 	} else if(opts.help) {
 		usage(stdout);
+		return RC_SUCCESS;
+	} else if(opts.version) {
+		puts(TILDEFIER_VERSION_STRING);
 		return RC_SUCCESS;
 	}
 
