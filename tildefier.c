@@ -29,7 +29,7 @@ static struct {
 	int intermediate_width;
 	bool newline, short_user, help;
 } opts = {
-	.name = "tildifer",
+	.name = "tildefer",
 	.newline = true,
 	.short_user = false,
 	.intermediate_width = 0,
@@ -96,7 +96,7 @@ static void usage(FILE* f) {
 	, opts.name);
 }
 
-static void tildify(char const* path) {
+static void tildefy(char const* path) {
 	setpwent();
 	for(struct passwd* pwent; (pwent = getpwent()); ) {
 		char const* home = pwent->pw_dir;
@@ -162,9 +162,9 @@ int main(int argc, char** argv) {
 				}
 				return RC_REALPATH_FAILURE;
 			}
-			tildify(buff);
+			tildefy(buff);
 			free(buff);
-		} else tildify(argv[i]);
+		} else tildefy(argv[i]);
 	}
 
 	#if CLEANUP
