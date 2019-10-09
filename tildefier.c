@@ -154,10 +154,10 @@ int main(int argc, char** argv) {
 	for(int i = 0; i < argc; ++i) {
 		char* buff = realpath(argv[i], NULL);
 		if(!buff) {
+			int err = errno;
 			#if CLEANUP
 			endpwent();
 			#endif
-			int err = errno;
 			switch(err) {
 				case EACCES:
 					fprintf(stderr, "Cannot open %s (permission denied)\n", argv[i]);
