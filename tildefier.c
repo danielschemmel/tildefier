@@ -32,9 +32,9 @@ static struct {
 	bool newline, short_user, help, version;
 } opts = {
 	.name = "tildefier",
+	.intermediate_width = 0,
 	.newline = true,
 	.short_user = false,
-	.intermediate_width = 0,
 	.help = false,
 	.version = false,
 };
@@ -70,6 +70,14 @@ static bool parse_opts(int* argc, char** argv) {
 					opts.newline = false;
 				} else if(strcmp("short", arg + 2) == 0) {
 					opts.short_user = true;
+				} else if(strcmp("uid", arg + 2) == 0) {
+					if(++from >= *argc) return false;
+					char* end = NULL;
+					errno = 0;
+					long uid = strtol(argv[from], &end, 10);
+					if(errno || !end || *end) return false;
+					if(uid < 0 || uid > INT_MAX) return false;
+					opts.uid = (int)uid;
 				} else return false;
 			} else if(arg[1] == 'h') {
 				if(arg[2] == '\0') {
@@ -102,16 +110,20 @@ static void usage(FILE* f) {
 		"     --intermediate-width N  Shorten all intermediate directories to N characters\n"
 		"  -n --no-newline            Do not output a newline\n"
 		"     --short                 Shorten the home directory of the current user to just '~'\n"
+		"     --uid UID               Use the user with the id UID instead of the current user.\n"
 		"  -v --version               Print \"" TILDEFIER_VERSION_STRING "\"\n"
 	, opts.name);
 }
 
-static void tildefy(char const* path) {
+static void tildefy(char const* path, bool ignore_relative_homes) {
 	setpwent();
 	for(struct passwd* pwent; (pwent = getpwent()); ) {
 		char const* home = pwent->pw_dir;
-		assert(home[0] == '/' && "home directories must be absolute paths");
-		if(home[1]) {
+		if(!ignore_relative_homes && home[0] != '/') {
+			fprintf(stderr, "The home directory %s for the user %s is not an absolute path.", home, pwent->pw_name);
+			abort();
+		}
+		if(home[0] == '/' && home[1]) {
 			size_t i = 1;
 			while(home[i] && path[i] && path[i] == home[i]) ++i;
 			if(home[i] == '\0' || (home[i] == '/' && home[i + 1] == '\0' && path[i] == '\0')) {
@@ -174,7 +186,7 @@ int main(int argc, char** argv) {
 			}
 			return RC_REALPATH_FAILURE;
 		}
-		tildefy(buff);
+		tildefy(buff, true);
 		free(buff);
 	}
 
